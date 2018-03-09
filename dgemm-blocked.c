@@ -29,9 +29,9 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 {
 
   /* For each row i of A */
-  for (int i = 0; i < M; i+=2) {
+  for (int i = 0; i < M; i+=1) {
       /* For each column j of B */
-      for (int j = 0; j < N; j+=2) {
+      for (int j = 0; j < N; j+=1) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
           double cijB = C[i + j * lda];
