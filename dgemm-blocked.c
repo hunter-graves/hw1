@@ -48,14 +48,6 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-    __m128d vecA;
-    __m128d vecB;
-    __m128d vecC;
-
-    __m128d vecAA;
-    __m128d vecBB;
-    __m128d vecCC;
-    __m128d result;
 
 //make a local aligned copy of A's block;
     for( int i = 0; i < M; i++ )
@@ -78,12 +70,22 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
             double tmpor = 0;
             double temp[2] __attribute__ ((aligned (16)));
 
+
+            __m128d vecA;
+            __m128d vecB;
+            __m128d vecC;
+
+            __m128d vecAA;
+            __m128d vecBB;
+            __m128d vecCC;
+            __m128d result;
+
             for (int k = 0; k < K; k += 4) {
                 vecA = _mm_load_pd(&a[k + i * BLOCK_SIZE]);
                 vecAA = _mm_load_pd(&a[(k + 2) + i * BLOCK_SIZE]);
 
-                vecB = _mm_loadu_pd(B[k + j * lda]);
-                vecBB = _mm_loadu_pd(B[(k + 2) + j * lda]);
+                vecB = _mm_loadu_pd(&B[k + j * lda]);
+                vecBB = _mm_loadu_pd(&B[(k + 2) + j * lda]);
 
                 vecC = _mm_mul_pd(vecA, vecB);
                 vecCC = _mm_mul_pd(vecAA, vecBB);
