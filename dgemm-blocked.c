@@ -175,7 +175,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-void baby_block (int lda, int M, int N, int K, double* A, double* B, double* C)
+void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     int babyBlock = baby1;
     double a[babyBlock*babyBlock] __attribute__ ((aligned (16)));
