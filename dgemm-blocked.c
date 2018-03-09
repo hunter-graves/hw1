@@ -28,34 +28,15 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
 
-    __m128d vecA1;
-    __m128d vecB1;
-    __m128d vecC1;
-    __m128d vecA2;
-    __m128d vecB2;
-    __m128d vecC2;
-    __m128d vecCtmp;
-
-    //for( int i = 0; i < M; i++ )
-      //  for( int j = 0; j < K; j++ )
-        //    a[j+i*lda] = A[i+j*lda];
-
   /* For each row i of A */
   for (int i = 0; i < M; i++) {
       /* For each column j of B */
-      for (int j = 0; j < N; j+=2) {
+      for (int j = 0; j < N; j++) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
-          double cij2 = C[i+j*lda];
-          for (int k = 0; k < K; k+=) {
-              vecA1 = _mm_loadl_pd(A + i * lda + k);
-              vecB1 = _mm_loadl_pd(B + j * lda + k);
-              vecB2 = _mm_loadl_pd(B + (j + 1) * lda + k);
-              cij += vecA1 * vecB1;
-              cij2 += vecA2 * vecB2;
-          }
-          C[i*lda + j] += cij[0]+cij[1];
-          C[i*lda + j + 1] += cij2[0] + cij2[1];
+          for (int k = 0; k < K; ++k)
+              cij += A[i + k * lda] * B[k + j * lda];
+          C[i + j * lda] = cij;
 
       }
 
