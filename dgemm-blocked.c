@@ -16,7 +16,7 @@ LDLIBS = -lrt -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKL
 const char* dgemm_desc = "Simple blocked dgemm.";
 #include <emmintrin.h>
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE 64
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -88,10 +88,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 vecC = _mm_mul_pd(vecA, vecB);
 
                 
-                vecAA = _mm_load_pd(&a[(k + 2) + i * BLOCK_SIZE]);
+                vecAA = _mm_load_pd(&a[k + 2 + i * BLOCK_SIZE]);
 
 
-                vecBB = _mm_loadu_pd(&B[(k + 2) + j * lda]);
+                vecBB = _mm_loadu_pd(&B[k + 2 + j * lda]);
 
 
                 vecCC = _mm_mul_pd(vecAA, vecBB);
