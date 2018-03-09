@@ -28,17 +28,17 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
   /* For each row i of A */
-  for (int i = 0; i < M; i+=2) {
+  for (int i = 0; i < M; i+=8) {
       /* For each column j of B */
-      for (int j = 0; j < N; j += 2) {
+      for (int j = 0; j < N; j += 8) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
           for (int k = 0; k < K; ++k)
               cij += A[i + k * lda] * B[k + j * lda];
           C[i + j * lda] = cij;
-          j -= 1;
+          j -= 7;
       }
-      i -= 1;
+      i -= 7;
   }
 }
 
