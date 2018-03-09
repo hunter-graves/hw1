@@ -12,11 +12,11 @@ MKLROOT = /opt/intel/composer_xe_2013.1.117/mkl
 LDLIBS = -lrt -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_sequential.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm
 
 */
-#include <emmintrin.h>
-const char* dgemm_desc = "Simple blocked dgemm.";
 
+const char* dgemm_desc = "Simple blocked dgemm.";
+#include <emmintrin.h>
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 41
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
