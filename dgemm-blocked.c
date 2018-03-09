@@ -30,7 +30,7 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
      double a[lda*lda] __attribute__ ((aligned (32)));
     for( int i = 0; i < M; i++ )
         for( int j = 0; j < K; j++ )
-            a[j+i*BLOCK_SIZE] = A[i+j*lda];
+            a[j+i*lda] = A[i+j*lda];
 
 
   /* For each row i of A */
