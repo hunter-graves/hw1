@@ -44,10 +44,28 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+    //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+
+
+    __m128d vecA;
+    __m128d vecB;
+    __m128d vecC;
+
+    __m128d vecAA;
+    __m128d vecBB;
+    __m128d vecCC;
+    __m128d tmpmm;
+
 //make a local aligned copy of A's block;
     for( int j = 0; j < K; j++ )
         for( int i = 0; i < M; i++ )
             a[i+j*BLOCK_SIZE] = A[i+j*lda];
+
+    //for (int j = 0; j < K; j++)
+      //  for (int i = 0; i < N; i++)
+       //     b[i+j*BLOCK_SIZE] = B[i+j*lda];
+
+
 /* For each row i of A */
     for (int i = 0; i < M; ++i)
 /* For each column j of B */
@@ -56,15 +74,34 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
             double tmp = 0;
-            //for (int k = 0; k < K; ++k){
-             //   tmp += a[i+k*BLOCK_SIZE] * B[k+j*lda];
+            double temp[];
+
                 for (int k = 0; k < K; k+= 2)
                 {
-                    cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
-                    cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
+                    vecA = _mm_load_pd (&A[i+k*BLOCK_SIZE]);
+                    vecAA = _mm_load_pd (&A[i+(k+1)*BLOCK_SIZE]);
+
+                    vecB = _mm_load_pd (&B[k+j*lda]);
+                    vecBB = _mm_load_pd (&B[(k+1)+j*lda]);
+
+                    vecC =  _mm_mul_pd(vecA, vecB);
+                    vecCC = _mm_mul_pd(vecAA, vecBB);
+
+
+
+
+                    tmpmm = _mm_add_pd(vecC, vecCC);
+
+                    _mm_storeu_pd(&temp[0], tmpmm);
+
+
+                    //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
+                    //cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
                 }
-           // }
-            C[i+j*lda] += tmp;
+            cij +=temp[0];
+
+            C[i+j*lda] += cij;
+            cij +=temp[1];
         }
 }
 
