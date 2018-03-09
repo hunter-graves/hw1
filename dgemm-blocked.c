@@ -27,7 +27,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-
+    static double a[lda*lda] __attribute__ ((aligned (32)));
     static double temp[2] __attribute__ ((aligned (16)));
     __m128d vecA1;
     __m128d vecB1;
