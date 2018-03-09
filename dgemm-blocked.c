@@ -46,7 +46,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
     //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
 
-    static double temp[3] __attribute__ ((aligned (16)));
+    static double temp[BLOCK_SIZE] __attribute__ ((aligned (16)));
 
     __m128d vecA;
     __m128d vecB;
@@ -55,7 +55,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     __m128d vecAA;
     __m128d vecBB;
     __m128d vecCC;
-    __m128d tmpmm;
+    __m128d result;
 
 //make a local aligned copy of A's block;
     for( int i = 0; i < M; i++ )
@@ -90,9 +90,9 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-                    tmpmm = _mm_add_pd(vecC, vecCC);
+                    result = _mm_add_pd(vecC, vecCC);
 
-                    _mm_storeu_pd(&temp[0], tmpmm);
+                    _mm_storeu_pd(&temp[0], result);
                     cij +=temp[0];
                     cij +=temp[1];
                     //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
@@ -130,15 +130,15 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
 
-       /*   if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
+          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
               do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
-*/
+
 
 	/* Perform individual block dgemm */
-	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+//	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
       }
 }
