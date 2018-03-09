@@ -88,10 +88,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 vecC = _mm_mul_pd(vecA, vecB);
 
                 
-                vecAA = _mm_load_pd(&a[k + 3 + i * BLOCK_SIZE]);
+                vecAA = _mm_load_pd(&a[k + 2 + i * BLOCK_SIZE]);
 
 
-                vecBB = _mm_loadu_pd(&B[k + 3 + j * lda]);
+                vecBB = _mm_loadu_pd(&B[k + 2 + j * lda]);
 
 
                 vecCC = _mm_mul_pd(vecAA, vecBB);
@@ -102,6 +102,8 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 _mm_store_pd(&temp[0], result);
                 cij += temp[0];
                 cij += temp[1];
+                temp[0] = 0;
+                temp[1] = 0;
                 //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
                 //cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
             }
