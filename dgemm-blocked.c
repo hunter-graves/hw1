@@ -25,9 +25,9 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 /* This auxiliary subroutine performs a smaller dgemm operation
  *  C := C + A * B
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
-static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
+static void do_block (int copylda, int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-    static double a[lda*lda] __attribute__ ((aligned (32)));
+    static double a[copylda*copylda] __attribute__ ((aligned (32)));
     static double temp[2] __attribute__ ((aligned (16)));
     __m128d vecA1;
     __m128d vecB1;
@@ -153,13 +153,15 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int M = min (BLOCK_SIZE, lda-i);
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
+          int copylda = lda;
 
 
           if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
-              do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+
+              do_block(copylda,lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
 
 
