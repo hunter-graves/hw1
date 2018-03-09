@@ -47,6 +47,8 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
 
 
+    double temp[4] __attribute__ ((aligned (16)));
+
 
 
 //make a local aligned copy of A's block;
@@ -68,7 +70,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
             double cij = C[i + j * lda];
             double tmpor = 0;
-            double temp[4];// __attribute__ ((aligned (16)));
+
 
 
             __m128d vecA;
@@ -81,12 +83,12 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
             __m128d result;
 
             for (int k = 0; k < K; k += 4) {
-                vecA = _mm_load_pd(&a[k + i * BLOCK_SIZE]);
+                vecA = _mm_loadu_pd(&a[k + i * BLOCK_SIZE]);
                 vecB = _mm_loadu_pd(&B[k + j * lda]);
                 vecC = _mm_mul_pd(vecA, vecB);
 
                 
-                vecAA = _mm_load_pd(&a[(k + 2) + i * BLOCK_SIZE]);
+                vecAA = _mm_loadu_pd(&a[(k + 2) + i * BLOCK_SIZE]);
 
 
                 vecBB = _mm_loadu_pd(&B[(k + 2) + j * lda]);
@@ -98,13 +100,13 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 result = _mm_add_pd(vecC, vecCC);
 
                 _mm_storeu_pd(&temp[0], result);
-
+                cij += temp[0];
+                cij += temp[1];
                 //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
                 //cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
             }
 
-            cij += temp[0];
-            cij += temp[1];
+
             C[i + j * lda] += cij;
 
         }
