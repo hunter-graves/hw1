@@ -50,8 +50,8 @@
       <file leaf-file-name="dgemm-blocked.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dgemm-blocked.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="179" column="4" lean-forward="false" selection-start-line="179" selection-start-column="4" selection-end-line="179" selection-end-column="4" />
+            <state relative-caret-position="486">
+              <caret line="179" column="25" lean-forward="false" selection-start-line="179" selection-start-column="25" selection-end-line="179" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -370,7 +370,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40179000" />
+    <option name="totallyTimeSpent" value="40416000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="75" y="82" width="1845" height="998" extended-state="0" />
@@ -539,8 +539,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dgemm-blocked.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="179" column="4" lean-forward="false" selection-start-line="179" selection-start-column="4" selection-end-line="179" selection-end-column="4" />
+        <state relative-caret-position="486">
+          <caret line="179" column="25" lean-forward="false" selection-start-line="179" selection-start-column="25" selection-end-line="179" selection-end-column="25" />
           <folding />
         </state>
       </provider>
