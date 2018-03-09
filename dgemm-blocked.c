@@ -69,14 +69,15 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 /* For each row i of A */
     for (int i = 0; i < M; ++i)
+    
 /* For each column j of B */
         for (int j = 0; j < N; ++j)
-        {
+
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
 
 
-                for (int k = 0; k < K; k += 8)
+                for (int k = 0; k < K; k += 4)
                 {
                     vecA = _mm_load_pd (&a[k+i*BLOCK_SIZE]);
                     vecAA = _mm_load_pd (&a[(k+2)+i*BLOCK_SIZE]);
@@ -102,7 +103,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
             C[i+j*lda] += cij;
 
-        }
+
 }
 
 

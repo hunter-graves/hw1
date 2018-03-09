@@ -1,6 +1,6 @@
 # On Bridges we will check versus your performance versus Intel MKL library's BLAS. 
 
-CC = cc 
+CC = icc
 OPT = -O3
 CFLAGS = -Wall -std=gnu99 $(OPT)
 #MKLROOT = /opt/intel/composer_xe_2013.1.117/mkl
