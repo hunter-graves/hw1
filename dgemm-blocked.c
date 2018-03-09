@@ -248,7 +248,7 @@ if ((M%BLOCK_SIZE != 0) && (N%BLOCK_SIZE !=0) && (K%BLOCK_SIZE!=0))
     int N = min (BLOCK_SIZE/2, lda-j);
     int K = min (BLOCK_SIZE/2, lda-k);
     int baby1 = lda-k;
-    void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C)
+    void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C);
 
 
 }
