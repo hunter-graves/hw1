@@ -90,10 +90,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
             for (int k = 0; k < K; k += 8) {
 
 
-                vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
-                vec1B = _mm256_loadu_pd(&B[k + j * lda]);
-                vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
-                vec2B = _mm256_loadu_pd(&B[k + 4 + j * lda]);
+                vec1A = _mm256_load_pd(&a[k + (i-8) * BLOCK_SIZE]);
+                vec1B = _mm256_loadu_pd(&B[k + (j-8) * lda]);
+                vec2A = _mm256_load_pd(&a[k + 4 + (i-8) * BLOCK_SIZE]);
+                vec2B = _mm256_loadu_pd(&B[k + 4 + (j-8) * lda]);
                 vec1C = _mm256_mul_pd(vec1A, vec1B);
                 vec2C = _mm256_mul_pd(vec2A, vec2B);
                 vecCtmp = _mm256_add_pd(vec1C, vec2C);
@@ -161,7 +161,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
         }
-    
+
     }
 }
 
