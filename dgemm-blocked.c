@@ -28,15 +28,44 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
 
+    static double temp[2] __attribute__ ((aligned (16)));
+    __m128d vecA1;
+    __m128d vecB1;
+    __m128d vecC1;
+    __m128d vecA2;
+    __m128d vecB2;
+    __m128d vecC2;
+    __m128d vecCtmp;
+
+
+
+    for( int i = 0; i < M; i++ )
+        for( int j = 0; j < K; j++ )
+            a[j+i*lda] = A[i+j*lda];
+
+
   /* For each row i of A */
   for (int i = 0; i < M; i++) {
       /* For each column j of B */
       for (int j = 0; j < N; j++) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
-          for (int k = 0; k < K; k++) {
+          for (int k = 0; k < K; k+=4) {
 
-              cij += A[i + k * lda] * B[k + j * lda];
+              vecA1 = _mm_load_pd (&a[k+i*lda]);
+              vecA2 = _mm_load_pd (&a[(k+2)+i*lda]);
+              vecB1 = _mm_loadu_pd (&B[k+j*lda]);
+              vecB2 = _mm_loadu_pd (&B[(k+2)+j*lda]);
+              vecC1 = _mm_mul_pd(vecA1, vecB1);
+              vecC2 = _mm_mul_pd(vecA2, vecB2);
+              vecCtmp = _mm_add_pd(vecC1, vecC2);
+              _mm_storeu_pd(&temp[0], vecCtmp);
+              cij += temp[0];
+              cij += temp[1];
+
+
+
+              //cij += A[i + k * lda] * B[k + j * lda];
           }
           C[i + j * lda] = cij;
 
