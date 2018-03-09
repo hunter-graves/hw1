@@ -200,9 +200,9 @@ void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, 
 
 
     /* For each row i of A */
-    for (int i = 0; i < M; ++i)
+    for (int i = 0; i < M; i+=8)
 /* For each column j of B */
-        for (int j = 0; j < N; ++j) {
+        for (int j = 0; j < N; j+=8) {
 /* Compute C(i,j) */
 
             double cij = C[i+j*lda];
