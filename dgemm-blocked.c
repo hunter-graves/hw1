@@ -68,7 +68,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
             double cij = C[i + j * lda];
             double tmpor = 0;
-            double temp[2] __attribute__ ((aligned (16)));
+            double temp[4] __attribute__ ((aligned (16)));
 
 
             __m128d vecA;
