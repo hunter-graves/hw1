@@ -175,7 +175,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C)
+void baby_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     int babyBlock = baby1;
     double a[babyBlock*babyBlock] __attribute__ ((aligned (16)));
@@ -243,10 +243,13 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	//do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
 if ((M%BLOCK_SIZE != 0) && (N%BLOCK_SIZE !=0) && (K%BLOCK_SIZE!=0))
 {
+
     int M = min (BLOCK_SIZE/2, lda-i);
     int N = min (BLOCK_SIZE/2, lda-j);
     int K = min (BLOCK_SIZE/2, lda-k);
-    break;
+    int baby1 = (min(min ((M,N),(min (M,K)))));
+    void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C)
+
 
 }
 
