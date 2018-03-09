@@ -28,12 +28,15 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
 
+
+
+
   /* For each row i of A */
   for (int i = 0; i < M; i++) {
       /* For each column j of B */
       for (int j = 0; j < N; j++) {
           /* Compute C(i,j) */
-          double cij = C[i + j * lda];
+          double cij = C[i + j * lda-BLOCK_SIZE];
 
           for (int k = 0; k < K; k+=2) {
               cij += A[i+k*lda] * B[k+j*lda];
