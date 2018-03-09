@@ -27,13 +27,16 @@ const char* dgemm_desc = "Simple blocked dgemm.";
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-    static double[4] x __attribute__ ((aligned (32)));
-    static double[4] y __attribute__ ((aligned (32)));
+   // static double[4] x __attribute__ ((aligned (32)));
+   // static double[4] y __attribute__ ((aligned (32)));
     __m256d vec1A;
     __m256d vec1AA;
     __m256d vec1B;
     __m256d vec1C;
     __256d vec1CC;
+
+    double[4] x __attribute__ ((aligned 32));
+    double[4] y __attribute__ ((aligned 32));
     double a1,a2,a3,a4;
 
   /* For each row i of A */
