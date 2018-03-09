@@ -17,7 +17,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 #include <emmintrin.h>
 #include <immintrin.h>
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 64
+#define BLOCK_SIZE 32
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -28,19 +28,19 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
   /* For each row i of A */
-  for (int i = 0; i < M; i+=2) {
-      /* For each column j of B */
-      for (int j = 0; j < N; j += 2) {
-          /* Compute C(i,j) */
-          double cij = C[i + j * lda];
-          for (int k = 0; k < K; k += 2) {
-              cij += A[i + k * lda] * B[k + j * lda];
-                cij+=A[i + (k+1) * lda] * B[(k+1) + j * lda];
-          }
-          C[i + j * lda] = cij;
-      }
-  }
-  }
+  for (int i = 0; i < M; i+=2)
+    /* For each column j of B */
+    for (int j = 0; j < N; j+=2)
+    {
+      /* Compute C(i,j) */
+      double cij = C[i+j*lda];
+      for (int k = 0; k < K; ++k)
+	cij += A[i+k*lda] * B[k+j*lda];
+      i-=1;
+        j-=1;
+        C[i+j*lda] = cij;
+    }
+}
 
 
 
@@ -123,7 +123,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int K = min (BLOCK_SIZE, lda-k);
 
 
-          if((M % BLOCK_SIZE == 0) || (N % BLOCK_SIZE == 0) || (K % BLOCK_SIZE == 0))
+          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
