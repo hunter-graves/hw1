@@ -47,7 +47,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
 
 
-    static double temp[4] __attribute__ ((aligned (32)));
+    static double temp[2] __attribute__ ((aligned (32)));
     double tmpor = 0;
 
 
