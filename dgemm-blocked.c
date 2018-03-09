@@ -161,7 +161,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
             }
             C[i+j*lda] = cij;
+            j-2;
+
         }
+    i-2;
 }
 
 
