@@ -18,7 +18,6 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 #include <immintrin.h>
 #if !defined(BLOCK_SIZE)
 #define BLOCK_SIZE 32
-#define babyBlock 41
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -83,9 +82,9 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 /* For each row i of A */
-    for (int i = 0; i < M; ++i)
+    for (int i = 0; i < M; i+=2)
 /* For each column j of B */
-        for (int j = 0; j < N; ++j)
+        for (int j = 0; j < N; j+=2)
         {
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
@@ -176,10 +175,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-void baby_block (int lda, int M, int N, int K, double* A, double* B, double* C)
+void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-
-    static double a[babyBlock] __attribute__ ((aligned (16)));
+    int babyBlock = baby1;
+    double a[babyBlock*babyBlock] __attribute__ ((aligned (16)));
     static double temp[4] __attribute__ ((aligned (32)));
 
 
@@ -227,9 +226,9 @@ void baby_block (int lda, int M, int N, int K, double* A, double* B, double* C)
                 */
 
 
-                vec1A = _mm256_load_pd (&a[k+i*babyBlock]);
+                vec1A = _mm256_load_pd (&a[k+i*BLOCK_SIZE]);
                 vec1B = _mm256_loadu_pd (&B[k+j*lda]);
-                vec2A = _mm256_load_pd (&a[k+4+i*babyBlock]);
+                vec2A = _mm256_load_pd (&a[k+4+i*BLOCK_SIZE]);
                 vec2B = _mm256_loadu_pd (&B[k+4+j*lda]);
                 vec1C = _mm256_mul_pd(vec1A, vec1B);
                 vec2C = _mm256_mul_pd(vec2A, vec2B);
@@ -286,13 +285,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
           if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
-          }
-          else if((M % babyBlock != 0) && (N % babyBlock != 0) && (K % babyBlock != 0))
-          {
-                baby_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
-          }
-
-          else{
+          }else{
               do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
 
