@@ -32,7 +32,7 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
       /* For each column j of B */
       for (int j = 0; j < N; j +=2) {
           /* Compute C(i,j) */
-          double cij = C[(i+1) + j(+1) * lda];
+          double cij = C[(i+1) + (j+1) * lda];
           for (int k = 0; k < K; k++)
               cij += A[(i+1 * lda)+k] * B[k + (j+1 * lda)];
           C[(i+1) + (j+1) * lda] = cij;
