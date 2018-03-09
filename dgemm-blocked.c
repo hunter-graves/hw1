@@ -34,18 +34,19 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
             a[i+j*lda] = A[i+j*lda];
 
   /* For each row i of A */
-  for (int i = 0; i < M; i+=2) {
+  for (int i = 0; i < M; ++i) {
       /* For each column j of B */
-      for (int j = 0; j < N; j+=2) {
+      for (int j = 0; j < N; ++j) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
-            //ouble cij2 = C[(i) + (j) * lda];
-          for (int k = 0; k < K; k+=2) {
+            double cij2 = C[(i) + (j) * lda];
+          for (int k = 0; k < K; ++k) {
               cij += a[i+k*lda] * B[k+j*lda];
-              cij += a[(i+1)+k+1*lda] * B[k+1+(j+1)*lda];
+              cij += a[(i+1)+k*lda] * B[k+(j+1)*lda];
               //cij2 += a[(i)+(k+1)*lda] * B[(k+1)+(j)*lda];
           }
           C[i + j * lda] = cij;
+          C[i+1 + j+1*lda] = cij2;
 
 
       }
