@@ -27,17 +27,6 @@ const char* dgemm_desc = "Simple blocked dgemm.";
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-   // static double[4] x __attribute__ ((aligned (32)));
-   // static double[4] y __attribute__ ((aligned (32)));
-    __m256d vec1A;
-    __m256d vec1AA;
-    __m256d vec1B;
-    __m256d vec1C;
-    __256d vec1CC;
-
-    double[4] x __attribute__ ((aligned 32));
-    double[4] y __attribute__ ((aligned 32));
-    double a1,a2,a3,a4;
 
   /* For each row i of A */
   for (int i = 0; i < M; i++) {
@@ -46,20 +35,11 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
           for (int k = 0; k < K; ++k) {
-              vec1A = _mm256d_load_pd(A + i*lda + k);
-              vec1AA = _mm256d_load_pd(B +j*lda + k );
-              vec1B = _mm256d_load_pd(B + (j+1) * lda + k);
-              //cij += A[i + k * lda] * B[k + j * lda];
 
-
-            //&x= _mm256_add_pd()
-            &x += _mm256d_mul_pd(vec1A,vec1AA);
-            &y +=  _mm256d_mul_pd(vec1A,vec1B);
-
+              cij += A[i + k * lda] * B[k + j * lda];
 
           }
-          C[i*lda + j] += x[0] + x[1];
-          C[i*lda + (j+1)] += y[0] + y[1];
+          C[i + j * lda] = cij;
 
       }
 
