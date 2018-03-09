@@ -100,7 +100,9 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 result = _mm_add_pd(vecC, vecCC);
 
                 _mm_storeu_pd(&temp[0], result);
-                cij += temp;
+                int len = (sizeof(temp)/sizeof(*temp));
+                for (int z = 0; z < len; z++)
+                cij += temp[z];
                 //cij += temp[1];
                 //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
                 //cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
