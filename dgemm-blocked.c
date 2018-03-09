@@ -64,12 +64,12 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
     __m256d vec1A;
     __m256d vec1B;
-    __m256d vec1C;
+   // __m256d vec1C;
     __m256d vec2A;
     __m256d vec2B;
-    __m256d vec2C;
-    __m256d vecCtmp;
-    __m256d vecCtmp2;
+  //  __m256d vec2C;
+  //  __m256d vecCtmp;
+  //  __m256d vecCtmp2;
 
 
 
@@ -91,10 +91,12 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 vec1B = _mm256_load_pd(&B[k + j * lda]);
                 vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
                 vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
-                vec1C = _mm256_mul_pd(vec1A, vec1B);
-                vec2C = _mm256_mul_pd(vec2A, vec2B);
-                vecCtmp = _mm256_add_pd(vec1C, vec2C);
-                _mm256_store_pd(&temp[0], vecCtmp);
+               // vec1C = _mm256_mul_pd(vec1A, vec1B);
+               // vec2C = _mm256_mul_pd(vec2A, vec2B);
+               // vecCtmp = _mm256_add_pd(vec1C, vec2C);
+
+                _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
+                //_mm256_store_pd(&temp[0], vecCtmp);
 
 
                 cij += temp[0];
