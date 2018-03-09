@@ -44,7 +44,7 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
-    static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+    //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
 
 
 
@@ -54,9 +54,9 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
         for( int j = 0; j < K; j++ )
             a[j+i*BLOCK_SIZE] = A[i+j*lda];
 
-    for (int j = 0; j < N; j++)
-        for (int i = 0; i < K; i++)
-            b[i+j*BLOCK_SIZE] = B[j+i*lda];
+    //for (int j = 0; j < K; j++)
+      //  for (int i = 0; i < N; i++)
+       //     b[i+j*BLOCK_SIZE] = B[i+j*lda];
 
 
 /* For each row i of A */
@@ -67,6 +67,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 /* Compute C(i,j) */
             double cij = C[i + j * lda];
+            double tmpor = 0;
             double temp[4];// __attribute__ ((aligned (16)));
 
 
@@ -81,14 +82,14 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
             for (int k = 0; k < K; k += 4) {
                 vecA = _mm_load_pd(&a[k + i * BLOCK_SIZE]);
-                vecB = _mm_loadu_pd(&b[k + j * lda]);
+                vecB = _mm_loadu_pd(&B[k + j * lda]);
                 vecC = _mm_mul_pd(vecA, vecB);
 
                 
                 vecAA = _mm_load_pd(&a[(k + 2) + i * BLOCK_SIZE]);
 
 
-                vecBB = _mm_loadu_pd(&b[(k + 2) + j * lda]);
+                vecBB = _mm_loadu_pd(&B[(k + 2) + j * lda]);
 
 
                 vecCC = _mm_mul_pd(vecAA, vecBB);
