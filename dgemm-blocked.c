@@ -197,7 +197,7 @@ void baby_block (int babyBlock, int lda, int M, int N, int K, double* A, double*
             for (int k = 0; k < K; k+=4) {
 
                 a1 = a[i + k * babyBlock];
-                a2 = a[i + (k + 1) * babyBlock;
+                a2 = a[i + (k + 1) * babyBlock];
                 a3 = a[i + (k + 2) * babyBlock];
                 a4 = a[i + (k + 3) * babyBlock];
                 b1 = B[k + j * lda];
