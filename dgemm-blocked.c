@@ -36,10 +36,9 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
       double cij = C[i+j*lda];
       for (int k = 0; k < K; ++k)
 	cij += A[i+k*lda] * B[k+j*lda];
-      i-=1;
+      C[i+j*lda] = cij;
         j-=1;
-        C[i+j*lda] = cij;
-    }
+    }i-=1;
 }
 
 
