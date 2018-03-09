@@ -78,8 +78,8 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
             //double tmpor = 0;
 
             for (int k = 0; k < K; k += 4) {
-                vecA = _mm_load_pd(&a[i + k * BLOCK_SIZE]);
-                vecAA = _mm_load_pd(&a[i+(k + 2) * BLOCK_SIZE]);
+                vecA = _mm_load_pd(&a[i+ k * BLOCK_SIZE]);
+                vecAA = _mm_load_pd(&a[i+ (k + 2)* BLOCK_SIZE]);
 
                 vecB = _mm_loadu_pd(&B[k + j * lda]);
                 vecBB = _mm_loadu_pd(&B[(k + 2) + j * lda]);
@@ -132,7 +132,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
 
-          if((M % BLOCK_SIZE == 0) || (N % BLOCK_SIZE == 0) || (K % BLOCK_SIZE == 0))
+          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
