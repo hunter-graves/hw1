@@ -76,7 +76,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
             double cij = C[i+j*lda];
 
 
-                for (int k = 0; k < K; k += 2)
+                for (int k = 0; k < K; k += 8)
                 {
                     vecA = _mm_load_pd (&a[k+i*BLOCK_SIZE]);
                     vecAA = _mm_load_pd (&a[(k+2)+i*BLOCK_SIZE]);
