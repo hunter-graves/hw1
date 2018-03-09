@@ -59,7 +59,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
         {
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
-            for (int k = 0; k < K; k+=4){
+            for (int k = 0; k < K; ++k){
 
                 a1 = a[i+k*BLOCK_SIZE];
                 a2 = a[i+(k+1)*BLOCK_SIZE];
