@@ -25,24 +25,8 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 /* This auxiliary subroutine performs a smaller dgemm operation
  *  C := C + A * B
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
-static void do_block (int copylda, int lda, int M, int N, int K, double* A, double* B, double* C)
+static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-     double a[copylda*copylda] __attribute__ ((aligned (16)));
-    static double temp[2] __attribute__ ((aligned (16)));
-    __m128d vecA1;
-    __m128d vecB1;
-    __m128d vecC1;
-    __m128d vecA2;
-    __m128d vecB2;
-    __m128d vecC2;
-    __m128d vecCtmp;
-
-
-
-    for( int i = 0; i < M; i++ )
-        for( int j = 0; j < K; j++ )
-            a[j+i*lda] = A[i+j*lda];
-
 
   /* For each row i of A */
   for (int i = 0; i < M; i++) {
@@ -50,22 +34,10 @@ static void do_block (int copylda, int lda, int M, int N, int K, double* A, doub
       for (int j = 0; j < N; j++) {
           /* Compute C(i,j) */
           double cij = C[i + j * lda];
-          for (int k = 0; k < K; k+=4) {
 
-              vecA1 = _mm_load_pd (&a[k+i*lda]);
-              vecA2 = _mm_load_pd (&a[(k+2)+i*lda]);
-              vecB1 = _mm_loadu_pd (&B[k+j*lda]);
-              vecB2 = _mm_loadu_pd (&B[(k+2)+j*lda]);
-              vecC1 = _mm_mul_pd(vecA1, vecB1);
-              vecC2 = _mm_mul_pd(vecA2, vecB2);
-              vecCtmp = _mm_add_pd(vecC1, vecC2);
-              _mm_storeu_pd(&temp[0], vecCtmp);
-              cij += temp[0];
-              cij += temp[1];
-
-
-
-              //cij += A[i + k * lda] * B[k + j * lda];
+          for (int k = 0; k < K; k+=2) {
+              cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
+              cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
           }
           C[i + j * lda] = cij;
 
@@ -153,15 +125,13 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int M = min (BLOCK_SIZE, lda-i);
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
-          int copylda = lda;
 
 
           if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
-
-              do_block(copylda,lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+              do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
 
 
