@@ -289,7 +289,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
           }
           else if((M % babyBlock != 0) && (N % babyBlock != 0) && (K % babyBlock != 0))
           {
-                baby_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda)
+                baby_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
 
           else{
