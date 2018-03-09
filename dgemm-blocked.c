@@ -16,7 +16,7 @@ LDLIBS = -lrt -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKL
 const char* dgemm_desc = "Simple blocked dgemm.";
 
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 41
+#define BLOCK_SIZE 64
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -39,6 +39,42 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
     }
 }
 
+
+
+void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
+{
+    static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+//make a local aligned copy of A's block;
+    for( int j = 0; j < K; j++ )
+        for( int i = 0; i < M; i++ )
+            a[i+j*BLOCK_SIZE] = A[i+j*lda];
+/* For each row i of A */
+    for (int i = 0; i < M; ++i)
+/* For each column j of B */
+        for (int j = 0; j < N; ++j)
+        {
+/* Compute C(i,j) */
+            double cij = C[i+j*lda];
+            double tmp = 0;
+            //for (int k = 0; k < K; ++k){
+             //   tmp += a[i+k*BLOCK_SIZE] * B[k+j*lda];
+                for (int k = 0; k < K; k+= 2)
+                {
+                    cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
+                    cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
+                }
+           // }
+            C[i+j*lda] += tmp;
+        }
+}
+
+
+
+
+
+
+
+
 /* This routine performs a dgemm operation
  *  C := C + A * B
  * where A, B, and C are lda-by-lda matrices stored in column-major format. 
@@ -57,7 +93,15 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
 
+          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
+          {
+              do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+          }else{
+              do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+          }
+
+
 	/* Perform individual block dgemm */
-	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+//	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
       }
 }
