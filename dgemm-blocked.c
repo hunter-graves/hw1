@@ -46,6 +46,7 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+    static double temp[2] __attribute__ ((aligned (16)));
     __m128d vecA1;
     __m128d vecB1;
     __m128d vecC1;
@@ -56,7 +57,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
-    double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
+    //double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
 //make a local aligned copy of A's block
     //for( int j = 0; j < K; j++ )
       //  for( int i = 0; i < M; i++ )
