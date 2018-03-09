@@ -74,16 +74,15 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
         {
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
-            double tmp = 0;
 
 
-                for (int k = 0; k < K; k+= 2)
+                for (int k = 0; k < K; k+= 4)
                 {
-                    vecA = _mm_load_pd (&A[i*BLOCK_SIZE+k]);
-                    vecAA = _mm_load_pd (&A[i*BLOCK_SIZE+(k+1)]);
+                    vecA = _mm_load_pd (&a[i*BLOCK_SIZE+k]);
+                    vecAA = _mm_load_pd (&a[i*BLOCK_SIZE+(k+2)]);
 
-                    vecB = _mm_load_pd (&B[k+j*lda]);
-                    vecBB = _mm_load_pd (&B[(k+1)+j*lda]);
+                    vecB = _mm_loadu_pd (&B[k+j*lda]);
+                    vecBB = _mm_loadu_pd (&B[(k+2)+j*lda]);
 
                     vecC =  _mm_mul_pd(vecA, vecB);
                     vecCC = _mm_mul_pd(vecAA, vecBB);
