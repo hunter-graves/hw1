@@ -243,7 +243,10 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	//do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
 if ((M%BLOCK_SIZE != 0) && (N%BLOCK_SIZE !=0) && (K%BLOCK_SIZE!=0))
 {
-    int babyBlock = (lda-k);
+    int M = min (BLOCK_SIZE/2, lda-i);
+    int N = min (BLOCK_SIZE/2, lda-j);
+    int K = min (BLOCK_SIZE/2, lda-k);
+    break;
 
 }
 
