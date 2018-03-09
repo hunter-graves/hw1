@@ -46,12 +46,28 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+    __m128d vecA1;
+    __m128d vecB1;
+    __m128d vecC1;
+    __m128d vecA2;
+    __m128d vecB2;
+    __m128d vecC2;
+    __m128d vecCtmp;
+
+
 
     double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
 //make a local aligned copy of A's block
-    for( int j = 0; j < K; j++ )
-        for( int i = 0; i < M; i++ )
-            a[i+j*BLOCK_SIZE] = A[i+j*lda];
+    //for( int j = 0; j < K; j++ )
+      //  for( int i = 0; i < M; i++ )
+        //a[i+j*BLOCK_SIZE] = A[i+j*lda];
+
+
+    for( int i = 0; i < M; i++ )
+        for( int j = 0; j < K; j++ )
+            a[j+i*BLOCK_SIZE] = A[i+j*lda];
+
+
 /* For each row i of A */
     for (int i = 0; i < M; ++i)
 /* For each column j of B */
@@ -60,14 +76,14 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
             double cij = C[i+j*lda];
             for (int k = 0; k < K; k+=4){
-
+/*
                 a1 = a[i+k*BLOCK_SIZE];
                 a2 = a[i+(k+1)*BLOCK_SIZE];
                 a3 = a[i+(k+2)*BLOCK_SIZE];
                 a4 = a[i+(k+3)*BLOCK_SIZE];
                 b1 = B[k+j*lda];
                 b2 = B[(k+1)+j*lda];
-                b3 = B[(k+900)+j*lda];
+                b3 = B[(k+2)+j*lda];
                 b4 = B[(k+3)+j*lda];
                 c1 = a1 * b1;
                 c2 = a2 * b2;
@@ -77,7 +93,18 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 cij += c2;
                 cij += c3;
                 cij += c4;
+*/
 
+                vecA1 = _mm_load_pd (&a[k+i*BLOCK_SIZE]);
+                vecA2 = _mm_load_pd (&a[(k+2)+i*BLOCK_SIZE]);
+                vecB1 = _mm_loadu_pd (&B[k+j*lda]);
+                vecB2 = _mm_loadu_pd (&B[(k+2)+j*lda]);
+                vecC1 = _mm_mul_pd(vecA1, vecB1);
+                vecC2 = _mm_mul_pd(vecA2, vecB2);
+                vecCtmp = _mm_add_pd(vecC1, vecC2);
+                _mm_storeu_pd(&temp[0], vecCtmp);
+                cij += temp[0];
+                cij += temp[1];
 
                 //cij += a[i+k*BLOCK_SIZE] * B[k+j*lda];
                 //cij += a[i+(k+1)*BLOCK_SIZE] * B[(k+1)+j*lda];
