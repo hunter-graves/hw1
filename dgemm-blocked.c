@@ -54,8 +54,8 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
         for( int j = 0; j < K; j++ )
             a[j+i*BLOCK_SIZE] = A[i+j*lda];
 
-    for (int j = 0; j < K; j++)
-        for (int i = 0; i < N; i++)
+    for (int j = 0; j < N; j++)
+        for (int i = 0; i < K; i++)
             b[i+j*BLOCK_SIZE] = B[j+i*lda];
 
 
