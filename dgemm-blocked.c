@@ -43,11 +43,11 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
 
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-    static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
-    //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
+    static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (128)));
+    //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (128)));
 
 
-    static double temp[2] __attribute__ ((aligned (16))) = {0, 1};
+    static double temp[2] __attribute__ ((aligned (128)));
     double tmpor = 0;
 
 
