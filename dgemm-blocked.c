@@ -65,9 +65,9 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 a2 = a[i+(k+1)*BLOCK_SIZE];
                 a3 = a[i+(k+2)*BLOCK_SIZE];
                 a4 = a[i+(k+3)*BLOCK_SIZE];
-                b1 = B[k+j*lda];;
+                b1 = B[k+j*lda];
                 b2 = B[(k+1)+j*lda];
-                b3 = B[(k+2)+j*lda];
+                b3 = B[(k+900)+j*lda];
                 b4 = B[(k+3)+j*lda];
                 c1 = a1 * b1;
                 c2 = a2 * b2;
