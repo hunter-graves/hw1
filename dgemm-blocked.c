@@ -179,9 +179,18 @@ void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, 
 {
     int babyBlock = baby1;
     double a[babyBlock*babyBlock] __attribute__ ((aligned (16)));
-    //atic double babyTemp[4] __attribute__ ((aligned (16)));
 
-    double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
+
+    //double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
+
+    __m256d vec1A;
+    __m256d vec1B;
+    __m256d vec1C;
+    __m256d vec2A;
+    __m256d vec2B;
+    __m256d vec2C;
+    __m256d vecCtmp;
+    __m256d vecCtmp2;
 
     for( int i = 0; i < M; i++ )
         for( int j = 0; j < K; j++ )
@@ -195,8 +204,8 @@ void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, 
 /* Compute C(i,j) */
 
             double cij = C[i+j*lda];
-            for (int k = 0; k < K; k+=4) {
-
+            for (int k = 0; k < K; k+=8) {
+/*
                 a1 = a[i + k * babyBlock];
                 a2 = a[i + (k + 1) * babyBlock];
                 a3 = a[i + (k + 2) * babyBlock];
@@ -213,6 +222,24 @@ void baby_block (int baby1, int lda, int M, int N, int K, double* A, double* B, 
                 cij += c2;
                 cij += c3;
                 cij += c4;
+                */
+
+
+                vec1A = _mm256_load_pd (&a[k+i*BLOCK_SIZE]);
+                vec1B = _mm256_loadu_pd (&B[k+j*lda]);
+                vec2A = _mm256_load_pd (&a[k+4+i*BLOCK_SIZE]);
+                vec2B = _mm256_loadu_pd (&B[k+4+j*lda]);
+                vec1C = _mm256_mul_pd(vec1A, vec1B);
+                vec2C = _mm256_mul_pd(vec2A, vec2B);
+                vecCtmp = _mm256_add_pd(vec1C,vec2C);
+                _mm256_store_pd(&temp[0], vecCtmp);
+
+
+                cij += temp[0];
+                cij += temp[1];
+                cij += temp[2];
+                cij += temp[3];
+
             }
         }
 
