@@ -15,6 +15,7 @@ LDLIBS = -lrt -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKL
 
 const char* dgemm_desc = "Simple blocked dgemm.";
 #include <emmintrin.h>
+#include "avxintrin_emu.h"
 #if !defined(BLOCK_SIZE)
 #define BLOCK_SIZE 128
 #endif
