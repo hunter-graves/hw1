@@ -82,12 +82,12 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 /* For each row i of A */
-    for (int i = 0; i < M; i+=2)
+    for (int i = 0; i < M; ++i)
 /* For each column j of B */
-        for (int j = 0; j < N; j+=2)
+        for (int j = 0; j < N; ++j)
         {
 /* Compute C(i,j) */
-            double cij = C[i/2+j/2*lda];
+            double cij = C[i+j*lda];
             for (int k = 0; k < K; k+=8){
 
 
@@ -175,6 +175,50 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 
+void baby_block (int babyBlock, int lda, int M, int N, int K, double* A, double* B, double* C)
+{
+    static double baby[babyBlock*babyBlock] __attribute__ ((aligned (16)));
+    //atic double babyTemp[4] __attribute__ ((aligned (16)));
+
+    double a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4;
+
+    for( int i = 0; i < M; i++ )
+        for( int j = 0; j < K; j++ )
+            a[j+i*babyBlock] = A[i+j*lda];
+
+
+    /* For each row i of A */
+    for (int i = 0; i < M; ++i)
+/* For each column j of B */
+        for (int j = 0; j < N; ++j) {
+/* Compute C(i,j) */
+
+            double cij = C[i+j*lda];
+            for (int k = 0; k < K; k+=4) {
+
+                a1 = a[i + k * babyBlock];
+                a2 = a[i + (k + 1) * babyBlock;
+                a3 = a[i + (k + 2) * babyBlock];
+                a4 = a[i + (k + 3) * babyBlock];
+                b1 = B[k + j * lda];
+                b2 = B[(k + 1) + j * lda];
+                b3 = B[(k + 2) + j * lda];
+                b4 = B[(k + 3) + j * lda];
+                c1 = a1 * b1;
+                c2 = a2 * b2;
+                c3 = a3 * b3;
+                c4 = a4 * b4;
+                cij += c1;
+                cij += c2;
+                cij += c3;
+                cij += c4;
+            }
+        }
+
+
+
+}
+
 
 /* This routine performs a dgemm operation
  *  C := C + A * B
@@ -196,6 +240,12 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 
 	/* Perform individual block dgemm */
 	//do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+if ((M%BLOCK_SIZE != 0) && (N%BLOCK_SIZE !=0) && (K%BLOCK_SIZE!=0))
+{
+    int babyBlock = (lda-k);
+
+}
+
 
 
           if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
