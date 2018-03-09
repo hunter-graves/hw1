@@ -45,7 +45,7 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
               //cij2 += a[(i)+(k+1)*lda] * B[(k+1)+(j)*lda];
           }
           C[i + j * lda] = cij;
-          C[(i+1)+(j+1)*lda] = cij2;
+          
 
       }
 
