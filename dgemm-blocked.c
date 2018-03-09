@@ -24,21 +24,21 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 /* This auxiliary subroutine performs a smaller dgemm operation
  *  C := C + A * B
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
+
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-  /* For each row i of A */
-  for (int i = 0; i < M; ++i)
-    /* For each column j of B */ 
-    for (int j = 0; j < N; ++j) 
-    {
-      /* Compute C(i,j) */
-      double cij = C[i+j*lda];
-      for (int k = 0; k < K; ++k)
-	cij += A[i+k*lda] * B[k+j*lda];
-      C[i+j*lda] = cij;
-    }
+    /* For each row i of A */
+    for (int i = 0; i < M; ++i)
+        /* For each column j of B */
+        for (int j = 0; j < N; ++j)
+        {
+            /* Compute C(i,j) */
+            double cij = C[i+j*lda];
+            for (int k = 0; k < K; ++k)
+                cij += A[i+k*lda] * B[k+j*lda];
+            C[i+j*lda] = cij;
+        }
 }
-
 
 
 void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* C)
@@ -46,7 +46,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     static double a[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
     //static double b[BLOCK_SIZE*BLOCK_SIZE] __attribute__ ((aligned (16)));
 
-    static double temp[2] __attribute__ ((aligned (16)));
+    static double temp[3] __attribute__ ((aligned (16)));
 
     __m128d vecA;
     __m128d vecB;
@@ -78,8 +78,8 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
                 for (int k = 0; k < K; k += 4)
                 {
-                    vecA = _mm_load_pd (&a[i*BLOCK_SIZE+k]);
-                    vecAA = _mm_load_pd (&a[i*BLOCK_SIZE+(k+2)]);
+                    vecA = _mm_load_pd (&a[k+i*BLOCK_SIZE]);
+                    vecAA = _mm_load_pd (&a[(k+2)+i*BLOCK_SIZE]);
 
                     vecB = _mm_loadu_pd (&B[k+j*lda]);
                     vecBB = _mm_loadu_pd (&B[(k+2)+j*lda]);
@@ -130,15 +130,15 @@ void square_dgemm (int lda, double* A, double* B, double* C)
 	int N = min (BLOCK_SIZE, lda-j);
 	int K = min (BLOCK_SIZE, lda-k);
 
-          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
+       /*   if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
           {
               do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }else{
               do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
           }
-
+*/
 
 	/* Perform individual block dgemm */
-//	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+	do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
       }
 }
