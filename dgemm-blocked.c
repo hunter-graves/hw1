@@ -48,9 +48,9 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
           double cij = C[i + j * lda];
           double cij2 = C[i+j*lda];
           for (int k = 0; k < K; k+=) {
-              vecA1 = _mm_load_pd(A + i * lda + k);
-              vecB1 = _mm_load_pd(B + j * lda + k);
-              vecB2 = _mm_load_pd(B + (j + 1) * lda + k);
+              vecA1 = _mm_loadl_pd(A + i * lda + k);
+              vecB1 = _mm_loadl_pd(B + j * lda + k);
+              vecB2 = _mm_loadl_pd(B + (j + 1) * lda + k);
               cij += vecA1 * vecB1;
               cij2 += vecA2 * vecB2;
           }
