@@ -70,7 +70,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
   //  __m256d vec2C;
   //  __m256d vecCtmp;
   //  __m256d vecCtmp2;
-__mm256d cij;
+//__mm256d cij;
 
 
     for( int i = 0; i < M; i++ )
@@ -84,7 +84,7 @@ __mm256d cij;
 /* For each column j of B */
         for (int j = 0; j < N; ++j) {
 /* Compute C(i,j) */
-             cij = _mm256_load_pd(&C[i + j * lda]);
+             double cij = (C[i + j * lda]);
             for (int k = 0; k < K; k += 8) {
 
 
