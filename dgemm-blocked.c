@@ -17,7 +17,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 #include <emmintrin.h>
 #include <immintrin.h>
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 96
+#define BLOCK_SIZE 34
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
