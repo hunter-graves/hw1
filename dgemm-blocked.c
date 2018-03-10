@@ -88,7 +88,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
              double cij = C[i + j * lda];
             //double new = C[i+1 + j * lda];
-            for (int k = 0; k < M; k += 8) {
+            for (int k = 0; k < j; k += 8) {
 
 
                 vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
