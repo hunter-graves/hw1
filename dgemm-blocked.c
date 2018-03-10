@@ -33,6 +33,8 @@ static void do_block (int lda, int M, int N, int K, double* A, double* B, double
         for( int i = 0; i < M; i++ )
             a[i+j*lda] = A[i+j*lda];
 
+
+
   /* For each row i of A */
   for (int i = 0; i < M; ++i) {
       /* For each column j of B */
@@ -85,7 +87,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
         for (int j = 0; j < N; ++j) {
 /* Compute C(i,j) */
              double cij = C[i + j * lda];
-            for (int k = 0; k < K; k += 8) {
+            for (int k = 0; k < N; k += 8) {
 
 
                 vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
