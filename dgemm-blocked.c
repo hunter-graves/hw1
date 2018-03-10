@@ -82,12 +82,13 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 /* For each row i of A */
-    for (int i = 0; i < M; ++i) {
+    for (int i = 0; i < M; i+=2) {
 /* For each column j of B */
         for (int j = 0; j < N; ++j) {
 /* Compute C(i,j) */
              double cij = C[i + j * lda];
-            for (int k = 0; k < N; k += 8) {
+            double newcij = C[i+1 + j * lda];
+            for (int k = 0; k < K; k += 8) {
 
 
                 vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
@@ -110,10 +111,28 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                cij += temp[2];
                 cij += temp[3];
 
+                vec1A = _mm256_load_pd(&a[k + i+1 * BLOCK_SIZE]);
+                //vec1B = _mm256_load_pd(&B[k + j * lda]);
+                vec2A = _mm256_load_pd(&a[k + 4 + i + 1 * BLOCK_SIZE]);
+                //vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
+                // vec1C = _mm256_mul_pd(vec1A, vec1B);
+                // vec2C = _mm256_mul_pd(vec2A, vec2B);
+                // vecCtmp = _mm256_add_pd(vec1C, vec2C);
+
+                _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
+                newcij += temp[0];
+                newcij += temp[1];
+                newcij += temp[2];
+                newcij += temp[3];
+
+
+
+
+
 
             }
             C[i + j * lda] = cij;
-
+            C[i+1 +j * lda] = newcij;
         }
 
     }
