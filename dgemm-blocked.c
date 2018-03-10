@@ -82,12 +82,12 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
 
 /* For each row i of A */
-    for (int i = 0; i < M; ++i) {
+    for (int i = 0; i < M; i+=8) {
 /* For each column j of B */
         for (int j = 0; j < N; j+=8) {
 /* Compute C(i,j) */
              double cij = C[i + j * lda];
-            for (int k = 0; k < N; k += 8) {
+            for (int k = 0; k < j; k += 8) {
 
 
                 vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
