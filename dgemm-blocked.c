@@ -65,6 +65,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
     __m256d vec2A;
     __m256d vec2B;
+    __m256d pointer = &temp[0];
 
 
 
@@ -90,7 +91,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
 
 
-                _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
+                _mm256_store_pd(pointer, _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
 
                 cij += temp[0];
                 cij += temp[1];
