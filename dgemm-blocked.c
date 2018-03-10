@@ -131,20 +131,33 @@ void square_dgemm (int lda, double* A, double* B, double* C)
     /* For each block-column of B */
     for (int j = 0; j < lda; j += BLOCK_SIZE)
       /* Accumulate block dgemms into block of C */
-      for (int k = 0; k < lda; k += BLOCK_SIZE)
-      {
-	/* Correct block dimensions if block "goes off edge of" the matrix */
-	int M = min (BLOCK_SIZE, lda-i);
-	int N = min (BLOCK_SIZE, lda-j);
-	int K = min (BLOCK_SIZE, lda-k);
+      for (int k = 0; k < lda; k += BLOCK_SIZE) {
+          /* Correct block dimensions if block "goes off edge of" the matrix */
+          int M = min (BLOCK_SIZE, lda - i);
+          int N = min (BLOCK_SIZE, lda - j);
+          int K = min (BLOCK_SIZE, lda - k);
 
 
-          if((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0))
-          {
-              do_block_fast(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
-          }else{
-              do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+          if ((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0)) {
+              do_block_fast(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
+          else if(K < BLOCK_SIZE){
+            do_block_fast(lda-K, M, N, K, A + i + k * (lda-K), B + k + j * (lda-K), C + i + j * (lda-K));
+          }
+
+          else if(N < BLOCK_SIZE){
+              do_block_fast(lda-N, M, N, K, A + i + k * (lda-N), B + k + j * (lda-N), C + i + j * (lda-N));
+          }
+          else if(M < BLOCK_SIZE){
+              do_block_fast(lda-M, M, N, K, A + i + k * (lda-M), B + k + j * (lda-M), C + i + j * (lda-M));
+          }
+
+
+      }
+
+          //else{
+         //     do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
+       //   }
 
 
 
