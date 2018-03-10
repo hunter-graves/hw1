@@ -17,7 +17,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
 #include <emmintrin.h>
 #include <immintrin.h>
 #if !defined(BLOCK_SIZE)
-#define BLOCK_SIZE 34
+#define BLOCK_SIZE 32
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -88,7 +88,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* Compute C(i,j) */
              double cij = C[i + j * lda];
             //double new = C[i+1 + j * lda];
-            for (int k = 0; k < K; k += 8) {
+            for (int k = 0; k < N; k += 8) {
 
 
                 vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
