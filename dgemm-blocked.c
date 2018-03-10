@@ -142,7 +142,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
               do_block_fast(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
           else if (K < BLOCK_SIZE) {
-              for(int i = 0; i < K; k+=(K % BLOCK_SIZE))
+              for(int i = 0; i < K; i+=(K % BLOCK_SIZE))
               do_block_fast(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * K);
           }
 /*
