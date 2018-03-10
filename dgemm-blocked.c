@@ -141,24 +141,19 @@ void square_dgemm (int lda, double* A, double* B, double* C)
           if ((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0)) {
               do_block_fast(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
-          else if(K < BLOCK_SIZE){
-            do_block_fast(lda-k, M, N, K, A + i + k * (lda-k), B + k + j * (lda-k), C + i + j * (lda-k));
+          if (K < BLOCK_SIZE) {
+              do_block_fast(lda - k, M, N, K, A + i + k * (lda - k), B + k + j * (lda - k), C + i + j * (lda - k));
           }
 
-          else if(N < BLOCK_SIZE){
-              do_block_fast((lda-j), M, N, K, A + i + k * (lda-j), B + k + j * (lda-j), C + i + j * (lda-j));
+          if (N < BLOCK_SIZE) {
+              do_block_fast((lda - j), M, N, K, A + i + k * (lda - j), B + k + j * (lda - j), C + i + j * (lda - j));
           }
-          else if(M < BLOCK_SIZE){
-              do_block_fast((lda-i), M, N, K, A + i + k * (lda-i), B + k + j * (lda-i), C + i + j * (lda-i));
+          if (M < BLOCK_SIZE) {
+              do_block_fast((lda - i), M, N, K, A + i + k * (lda - i), B + k + j * (lda - i), C + i + j * (lda - i));
+          } else {
+              do_block(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
-
-
       }
-
-          //else{
-         //     do_block(lda, M, N, K, A + i + k*lda, B + k + j*lda, C + i + j*lda);
-       //   }
-
 
 
 
