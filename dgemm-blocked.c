@@ -27,11 +27,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
  * where C is M-by-N, A is M-by-K, and B is K-by-N. */
 static void do_block (int lda, int M, int N, int K, double* A, double* B, double* C)
 {
-     //double a[lda*lda] __attribute__ ((aligned (16)));
 
-    /*for( int j = 0; j < K; j++ )
-        for( int i = 0; i < M; i++ )
-            a[i+j*lda] = A[i+j*lda];
 
 
 
@@ -66,13 +62,10 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
     __m256d vec1A;
     __m256d vec1B;
-   // __m256d vec1C;
+
     __m256d vec2A;
     __m256d vec2B;
-  //  __m256d vec2C;
-  //  __m256d vecCtmp;
-  //  __m256d vecCtmp2;
-//__mm256d cij;
+
 
 
     for( int i = 0; i < M; i++ )
@@ -95,32 +88,14 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 vec1B = _mm256_load_pd(&B[k + j * lda]);
                 vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
                 vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
-               // vec1C = _mm256_mul_pd(vec1A, vec1B);
-               // vec2C = _mm256_mul_pd(vec2A, vec2B);
-               // vecCtmp = _mm256_add_pd(vec1C, vec2C);
+
 
                 _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
-                //_mm256_store_pd(&temp[0], vecCtmp);
 
-
-               // _mm256_stream_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
-
-                // _mm256_add_pd(_mm256_add_pd(temp[0],temp[1]),_mm256_add_pd(temp[2],temp[3]));
                 cij += temp[0];
                 cij += temp[1];
                cij += temp[2];
                 cij += temp[3];
-
-                //vec1A = _mm256_load_pd(&a[k + i+1 * BLOCK_SIZE]);
-                //vec1B = _mm256_load_pd(&B[k + j * lda]);
-               // vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
-               // vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
-                // vec1C = _mm256_mul_pd(vec1A, vec1B);
-                // vec2C = _mm256_mul_pd(vec2A, vec2B);
-                // vecCtmp = _mm256_add_pd(vec1C, vec2C);
-
-               // _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
-
 
 
 
@@ -159,34 +134,7 @@ void square_dgemm (int lda, double* A, double* B, double* C)
           if ((M % BLOCK_SIZE == 0) && (N % BLOCK_SIZE == 0) && (K % BLOCK_SIZE == 0)) {
               do_block_fast(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
-          /* else if (K < BLOCK_SIZE) {
-              //  for(int i = 0; i < K; i+=(K % BLOCK_SIZE))
-              do_block(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
-          }
-
-          else if (M < BLOCK_SIZE) {
-              //  for(int i = 0; i < K; i+=(K % BLOCK_SIZE))
-              do_block(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
-          }
-
-
-          else if (N < BLOCK_SIZE) {
-              //  for(int i = 0; i < K; i+=(K % BLOCK_SIZE))
-              do_block(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
-          }
-*/
-
-
-
-
-        //  }
-/*
-          if (N < BLOCK_SIZE) {
-              do_block_fast((lda - j), M, N, K, A + i + k * (lda - j), B + k + j * (lda - j), C + i + j * (lda - j));
-          }
-          if (M < BLOCK_SIZE) {
-              do_block_fast((lda - i), M, N, K, A + i + k * (lda - i), B + k + j * (lda - i), C + i + j * (lda - i));
-          } */else {
+       else {
               do_block(lda, M, N, K, A + i + k * lda, B + k + j * lda, C + i + j * lda);
           }
       }
