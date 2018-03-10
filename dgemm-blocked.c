@@ -75,7 +75,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 
     for( int i = 0; i < M; i++ )
         for( int j = 0; j < K; j++ )
-           // a[j+i*BLOCK_SIZE] = A[i+j*lda];
+            a[j+i*BLOCK_SIZE] = A[i+j*lda];
 
 
 
@@ -84,7 +84,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
 /* For each column j of B */
         for (int j = 0; j < N; ++j) {
 /* Compute C(i,j) */
-             double cij = (C[i + j * lda]);
+             double cij = C[i + j * lda];
             for (int k = 0; k < K; k += 8) {
 
 
@@ -99,7 +99,7 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
                 //_mm256_store_pd(&temp[0], vecCtmp);
 
-                cij = _mm256_add_pd(_mm256_add_pd(temp[0],temp[1]),_mm256_add_pd(temp[2],temp[3]));
+                cij = _mm256_set_pd(_mm256_add_pd(temp[0],temp[1]),_mm256_add_pd(temp[2],temp[3]));
                // cij += temp[0];
               //  cij += temp[1];
                // cij += temp[2];
