@@ -62,35 +62,36 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
     static double temp[4] __attribute__ ((aligned (32)));
 
 
-  //  __m256d vec1A;
-  //  __m256d vec1B;
+    __m256d vec1A;
+    __m256d vec1B;
    // __m256d vec1C;
-  //  __m256d vec2A;
-  //  __m256d vec2B;
+    __m256d vec2A;
+    __m256d vec2B;
   //  __m256d vec2C;
   //  __m256d vecCtmp;
   //  __m256d vecCtmp2;
-
+__mm256d cij;
 
 
     for( int i = 0; i < M; i++ )
         for( int j = 0; j < K; j++ )
-            a[j+i*BLOCK_SIZE] = A[i+j*lda];
+           // a[j+i*BLOCK_SIZE] = A[i+j*lda];
+
 
 
 /* For each row i of A */
-    for (int i = 0; i < M; i++) {
+    for (int i = 0; i < M; ++i) {
 /* For each column j of B */
-        for (int j = 0; j < N; j++) {
+        for (int j = 0; j < N; ++j) {
 /* Compute C(i,j) */
-            double cij = C[i + j * lda];
+             cij = _mm256_load_pd(&C[i + j * lda]);
             for (int k = 0; k < K; k += 8) {
 
 
-                __m256d vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
-                __m256d  vec1B = _mm256_load_pd(&B[k + j * lda]);
-                __m256d  vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
-                __m256d vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
+                vec1A = _mm256_load_pd(&a[k + i * BLOCK_SIZE]);
+                vec1B = _mm256_load_pd(&B[k + j * lda]);
+                vec2A = _mm256_load_pd(&a[k + 4 + i * BLOCK_SIZE]);
+                vec2B = _mm256_load_pd(&B[k + 4 + j * lda]);
                // vec1C = _mm256_mul_pd(vec1A, vec1B);
                // vec2C = _mm256_mul_pd(vec2A, vec2B);
                // vecCtmp = _mm256_add_pd(vec1C, vec2C);
@@ -98,11 +99,11 @@ void do_block_fast (int lda, int M, int N, int K, double* A, double* B, double* 
                 _mm256_store_pd(&temp[0], _mm256_add_pd((_mm256_mul_pd(vec1A, vec1B)),(_mm256_mul_pd(vec2A, vec2B))));
                 //_mm256_store_pd(&temp[0], vecCtmp);
 
-
-                cij += temp[0];
-                cij += temp[1];
-                cij += temp[2];
-                cij += temp[3];
+                cij = _mm256_add_pd(_mm256_add_pd(temp[0],temp[1]),_mm256_add_pd(temp[2],temp[3]));
+               // cij += temp[0];
+              //  cij += temp[1];
+               // cij += temp[2];
+               // cij += temp[3];
 
 
             }
